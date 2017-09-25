@@ -3,9 +3,12 @@ package main
 import (
 	"fmt"
 	"os"
+	"flag"
 	"net/http"
 	"encoding/json"
 )
+
+var units string
 
 type Forecast struct {
 	Latitutde float64 `json:"latitutde"`
@@ -25,18 +28,9 @@ type Point struct {
 	ApparentTemperatureHighTime int64 `json:"apparentTemperatureHighTime"`
 	ApparentTemperatureLow float64 `json:apparentTemperatureLow"`
 	ApparentTemperatureLowTime int64 `json:"apparentTemperatureLowTime"`
-	ApparentTemperatureMax float64 `json:apparentTemperatureMax"`
-	ApparentTemperatureMaxTime int64 `json:"apparentTemperatureMaxTime"`
-	ApparentTemperatureMin float64 `json:apparentTemperatureMin"`
-	ApparentTemperatureMinTime int64 `json:"apparentTemperatureMinTime"`
 	CloudCover float64 `json:"cloudCover"`
-	DewPoint float64 `json:"dewPoint"`
 	Humidity float64 `json:"humidity"`
 	Icon string `json:"icon"`
-	MoonPhase float64 `json:"moonPhase"`
-	NearestStormBearing float64 `json:nearestStormBearing"`
-	NearestStormDistance float64 `json:"nearestStormDistance"`
-	Ozone float64 `json:"ozone"`
 	PrecipAccumulation float64 `json:"precipAccumulation"`
 	PrecipIntensity float64 `json:"precipIntensity"`
 	PrecipIntensityMax float64 `json:"precipIntensityMax"`
@@ -51,10 +45,6 @@ type Point struct {
 	TemperatureHighTime float64 `json:"temperatureHighTime"`
 	TemperatureLow float64 `json:"temperatureLow"`
 	TemperatureLowTime float64 `json:"temperatureLowTime"`
-	TemperatureMax float64 `json:"temperatureMax"`
-	TemperatureMaxTime float64 `json:"temperatureMaxTime"`
-	TemperatureMin float64 `json:"temperatureMin"`
-	TemperatureMinTime float64 `json:"temperatureMinTime"`
 	Time int64 `json:"time"`
 	WindBearing float64 `json:"windBearing"`
 	WindGust float64 `json:"windGust"`
@@ -99,15 +89,42 @@ func getForecast(url string) (forecast Forecast, err error) {
 		return forecast, fmt.Errorf("failed %s", err)
 	}
 
-	fmt.Println(forecast)
 	return forecast, err
 }
 
+func init() {
+	flag.StringVar(&units, "units", "F", "Temperature units")
+	flag.Parse()
+}
+
 func main() {
-	args := os.Args[1:]
+	args := os.Args[2:]
 	if len(args) < 1 {
-		fmt.Println("Please provide a url")
+		fmt.Printf("Please provide a url\n")
 	} else {
-		getForecast(args[0])
+		forecast, err := getForecast(args[0])
+		if err != nil {
+			fmt.Errorf("failed %s", err)
+		}
+		now := forecast.Currently.Temperature
+		feels := forecast.Currently.ApparentTemperature
+		high := forecast.Daily.Data[0].TemperatureHigh
+		low := forecast.Daily.Data[0].TemperatureLow
+		if units == "C" {
+			now = convert(now)
+			feels = convert(feels)
+			high = convert(high)
+			low = convert(low)
+		}
+		fmt.Printf("%s\n", forecast.Currently.Summary)
+		fmt.Printf("Temperature now (°%s): %f\n", units, now)
+		fmt.Printf("Feels like (°%s): %f\n", units, feels)
+		fmt.Printf("High (°%s): %f\n", units, high)
+		fmt.Printf("Low (°%s): %f\n", units, low)
+		fmt.Printf("Wind speed (mph): %f\n", forecast.Currently.WindSpeed)
 	}
+}
+
+func convert(fahrenheit float64) float64 {
+	return (fahrenheit-32.0) * (5.0/9.0)
 }
