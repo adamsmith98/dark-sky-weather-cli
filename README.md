@@ -12,7 +12,6 @@ Example (show temperatures in degrees celsius)
 ./main -units=C
 ```
 ## Development
-Currently only fetches data from the specified URL
 
 ### Next steps 
 * Add ability to request different times
