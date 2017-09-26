@@ -2,14 +2,18 @@
 Command-line interface for Dark Sky weather API
 
 ## Usage
+Create API_KEY file containing your Dark Sky API key in the same directory as main.go
 ```
-go build main.go
-./main [DARK SKY API URL]
+go build main.go geo.go
+./main <options>
 ``` 
+Example (show temperatures in degrees celsius)
+```
+./main -units=C
+```
 ## Development
-Currently only fetches data from the specified URL.
+Currently only fetches data from the specified URL
 
 ### Next steps 
-* Get location automatically
 * Add ability to request different times
 * Include weather icons
