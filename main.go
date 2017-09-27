@@ -19,8 +19,8 @@ func init() {
 	flag.StringVar(&apiKey, "k", "", "Dark Sky API key")
 	flag.IntVar(&days, "days", 0, "Number of days")
 	flag.IntVar(&days, "d", 0, "Number of days")
-	flag.StringVar(&units, "units", "F", "Temperature units")
-	flag.StringVar(&units, "u", "F", "Temperature units")
+	flag.StringVar(&units, "units", "auto", "Units (ca, uk2, us, si)")
+	flag.StringVar(&units, "u", "auto", "Units (ca, uk2, us, si)")
 
 	flag.Parse()
 }
@@ -47,7 +47,7 @@ func main() {
 		key = strings.TrimRight(string(buffer), "\n")
 	}
 
-	forecast, err := getForecast(fmt.Sprintf("https://api.darksky.net/forecast/%s/%f,%f", key, geo.Latitude, geo.Longitude))
+	forecast, err := getForecast(fmt.Sprintf("https://api.darksky.net/forecast/%s/%f,%f?units=%s", key, geo.Latitude, geo.Longitude, units))
 	if err != nil {
 		exitOnError(err)
 	}

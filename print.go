@@ -15,8 +15,8 @@ func printDays(forecast Forecast, geo Geocode) {
 		year, month, day := t.Date()
 		weekday := t.Weekday().String()
 		fmt.Printf("Forecast for %s %d %s %d\n", weekday, day, month.String(), year)
-		fmt.Printf("High (°%s): %f\n", units, forecast.Daily.Data[0].TemperatureHigh)
-		fmt.Printf("Low (°%s): %f\n", units, forecast.Daily.Data[0].TemperatureLow)
+		fmt.Printf("High: %f\n", forecast.Daily.Data[0].TemperatureHigh)
+		fmt.Printf("Low: %f\n", forecast.Daily.Data[0].TemperatureLow)
 		fmt.Println()
 	}
 }
@@ -27,22 +27,11 @@ func printNow(forecast Forecast, geo Geocode) {
 	high := forecast.Daily.Data[0].TemperatureHigh // High today
 	low := forecast.Daily.Data[0].TemperatureLow // Low today
 
-	if units == "C" {
-		now = convert(now)
-		feels = convert(feels)
-		high = convert(high)
-		low = convert(low)
-	}
-
 	fmt.Printf("Weather in %s, %s, %s\n", geo.City, geo.Region, geo.Country)
 	fmt.Printf("%s\n", forecast.Currently.Summary)
-	fmt.Printf("Temperature now (°%s): %f\n", units, now)
-	fmt.Printf("Feels like (°%s): %f\n", units, feels)
-	fmt.Printf("High (°%s): %f\n", units, high)
-	fmt.Printf("Low (°%s): %f\n", units, low)
-	fmt.Printf("Wind speed (mph): %f\n", forecast.Currently.WindSpeed)
-}
-
-func convert(fahrenheit float64) float64 {
-	return (fahrenheit-32.0) * (5.0/9.0)
+	fmt.Printf("Temperature now: %f\n", now)
+	fmt.Printf("Feels like: %f\n", feels)
+	fmt.Printf("High: %f\n", high)
+	fmt.Printf("Low: %f\n", low)
+	fmt.Printf("Wind speed: %f\n", forecast.Currently.WindSpeed)
 }
