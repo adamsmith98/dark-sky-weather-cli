@@ -1,49 +1,50 @@
 package main
 
 import (
-	"fmt"
 	"flag"
+	"fmt"
+	"io/ioutil"
+	"os"
 	"strings"
 	"time"
-	"io/ioutil"
 )
 
 var (
-	units string
-	days int
 	apiKey string
+	days int
+	units string
 )
 
 func init() {
-	flag.StringVar(&units, "units", "F", "Temperature units")
-	flag.IntVar(&days, "days", 0, "Number of days")
 	flag.StringVar(&apiKey, "key", "", "Dark Sky API key")
+	flag.IntVar(&days, "days", 0, "Number of days")
+	flag.StringVar(&units, "units", "F", "Temperature units")
 	flag.Parse()
 }
 
 func main() {
 	geo, err := Locate()
 	if err != nil {
-		fmt.Errorf("failed %s", err)
+		exitOnError(err)
 	}
 	var key string
 	if apiKey != "" {
 		err = ioutil.WriteFile("API_KEY", []byte(fmt.Sprintf("%s\n", apiKey)), 0666)
 		fmt.Printf("Saved key %s to file API_KEY\n", apiKey)
 		if err != nil {
-			fmt.Errorf("failed %s", err)
+			exitOnError(err)
 		}
 		key = apiKey
 	} else {
 		buffer, err := ioutil.ReadFile("API_KEY")
 		if err != nil {
-			fmt.Errorf("failed %s", err)
+			exitOnError(err)
 		}
 		key = strings.TrimRight(string(buffer), "\n")
 	}
 	forecast, err := getForecast(fmt.Sprintf("https://api.darksky.net/forecast/%s/%f,%f", key, geo.Latitude, geo.Longitude))
 	if err != nil {
-		fmt.Errorf("failed %s", err)
+		exitOnError(err)
 	}
 	if days > 0 {
 		if days > 7 {
@@ -79,6 +80,11 @@ func main() {
 		fmt.Printf("Low (°%s): %f\n", units, low)
 		fmt.Printf("Wind speed (mph): %f\n", forecast.Currently.WindSpeed)
 	}
+}
+
+func exitOnError(err error) {
+	fmt.Println(err)
+	os.Exit(1)
 }
 
 func convert(fahrenheit float64) float64 {
