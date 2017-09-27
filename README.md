@@ -2,7 +2,6 @@
 Command-line interface for Dark Sky weather API
 
 ## Usage
-Create API_KEY file containing your Dark Sky API key in the same directory as main.go
 ```
 go build main.go geo.go forecast.go print.go
 ./main <options>
@@ -10,6 +9,10 @@ go build main.go geo.go forecast.go print.go
 Example (get next 4 days forecast)
 ```
 ./main -days=4
+```
+Setup with key
+```
+./main -key=[API KEY]
 ```
 ## Development
 
