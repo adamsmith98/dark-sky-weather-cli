@@ -51,7 +51,8 @@ func main() {
 			days = 7
 		}
 		fmt.Printf("Weather in %s, %s, %s\n", geo.City, geo.Region, geo.Country)
-		fmt.Printf("Showing weather for %d days", days)
+		fmt.Printf("Showing weather for %d days\n", days)
+		fmt.Println()
 		for i := 0; i < days; i++ {
 			t := time.Unix(forecast.Daily.Data[i].Time, 0)
 			year, month, day := t.Date()
