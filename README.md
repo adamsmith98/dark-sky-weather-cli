@@ -14,5 +14,6 @@ Example (show temperatures in degrees celsius)
 ## Development
 
 ### Next steps 
-* Add ability to request different times
+* Config option
+* Automatic units
 * Include weather icons
