@@ -17,8 +17,11 @@ var (
 
 func init() {
 	flag.StringVar(&apiKey, "key", "", "Dark Sky API key")
+	flag.StringVar(&apiKey, "k", "", "Dark Sky API key")
 	flag.IntVar(&days, "days", 0, "Number of days")
+	flag.IntVar(&days, "d", 0, "Number of days")
 	flag.StringVar(&units, "units", "F", "Temperature units")
+	flag.StringVar(&units, "u", "F", "Temperature units")
 	flag.Parse()
 }
 
