@@ -15,5 +15,6 @@ Example (show temperatures in degrees celsius)
 
 ### Next steps 
 * Refactor
+* Unit testing
 * Automatic units
 * Include weather icons
