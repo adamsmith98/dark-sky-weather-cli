@@ -13,6 +13,7 @@ import (
 var (
 	units string
 	days int
+	apiKey string
 )
 
 type Forecast struct {
@@ -85,6 +86,9 @@ func getForecast(url string) (forecast Forecast, err error) {
 	if err != nil {
 		return forecast, fmt.Errorf("failed %s", err)
 	}
+	if res.Status != "200 OK" {
+		return forecast, fmt.Errorf("failed status %s", res.Status)
+	}
 
 	dec := json.NewDecoder(res.Body)
 	if err = dec.Decode(&forecast); err != nil {
@@ -97,6 +101,7 @@ func getForecast(url string) (forecast Forecast, err error) {
 func init() {
 	flag.StringVar(&units, "units", "F", "Temperature units")
 	flag.IntVar(&days, "days", 0, "Number of days")
+	flag.StringVar(&apiKey, "key", "", "Dark Sky API key")
 	flag.Parse()
 }
 
@@ -105,11 +110,21 @@ func main() {
 	if err != nil {
 		fmt.Errorf("failed %s", err)
 	}
-	buffer, err := ioutil.ReadFile("API_KEY")
-	if err != nil {
-		fmt.Errorf("failed %s", err)
+	var key string
+	if apiKey != "" {
+		err = ioutil.WriteFile("API_KEY", []byte(fmt.Sprintf("%s\n", apiKey)), 0666)
+		fmt.Printf("Saved key %s to file API_KEY\n", apiKey)
+		if err != nil {
+			fmt.Errorf("failed %s", err)
+		}
+		key = apiKey
+	} else {
+		buffer, err := ioutil.ReadFile("API_KEY")
+		if err != nil {
+			fmt.Errorf("failed %s", err)
+		}
+		key = strings.TrimRight(string(buffer), "\n")
 	}
-	key := strings.TrimRight(string(buffer), "\n")
 	forecast, err := getForecast(fmt.Sprintf("https://api.darksky.net/forecast/%s/%f,%f", key, geo.Latitude, geo.Longitude))
 	if err != nil {
 		fmt.Errorf("failed %s", err)
