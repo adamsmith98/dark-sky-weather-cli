@@ -7,14 +7,13 @@ Create API_KEY file containing your Dark Sky API key in the same directory as ma
 go build main.go geo.go
 ./main <options>
 ``` 
-Example (show temperatures in degrees celsius)
+Example (get next 4 days forecast)
 ```
-./main -units=C
+./main -days=4
 ```
 ## Development
 
 ### Next steps 
 * Refactor
 * Unit testing
-* Automatic units
 * Include weather icons
