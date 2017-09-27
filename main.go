@@ -4,12 +4,16 @@ import (
 	"fmt"
 	"flag"
 	"strings"
+	"time"
 	"io/ioutil"
 	"net/http"
 	"encoding/json"
 )
 
-var units string
+var (
+	units string
+	days int
+)
 
 type Forecast struct {
 	Latitutde float64 `json:"latitutde"`
@@ -92,6 +96,7 @@ func getForecast(url string) (forecast Forecast, err error) {
 
 func init() {
 	flag.StringVar(&units, "units", "F", "Temperature units")
+	flag.IntVar(&days, "days", 0, "Number of days")
 	flag.Parse()
 }
 
@@ -109,23 +114,40 @@ func main() {
 	if err != nil {
 		fmt.Errorf("failed %s", err)
 	}
-	now := forecast.Currently.Temperature
-	feels := forecast.Currently.ApparentTemperature
-	high := forecast.Daily.Data[0].TemperatureHigh
-	low := forecast.Daily.Data[0].TemperatureLow
-	if units == "C" {
-		now = convert(now)
-		feels = convert(feels)
-		high = convert(high)
-		low = convert(low)
+	if days > 0 {
+		if days > 7 {
+			days = 7
+		}
+		fmt.Printf("Weather in %s, %s, %s\n", geo.City, geo.Region, geo.Country)
+		fmt.Printf("Showing weather for %d days", days)
+		for i := 0; i < days; i++ {
+			t := time.Unix(forecast.Daily.Data[i].Time, 0)
+			year, month, day := t.Date()
+			weekday := t.Weekday().String()
+			fmt.Printf("Forecast for %s %d %s %d\n", weekday, day, month.String(), year)
+			fmt.Printf("High (°%s): %f\n", units, forecast.Daily.Data[i].TemperatureHigh)
+			fmt.Printf("Low (°%s): %f\n", units, forecast.Daily.Data[i].TemperatureLow)
+			fmt.Println()
+		}
+	} else {
+		now := forecast.Currently.Temperature
+		feels := forecast.Currently.ApparentTemperature
+		high := forecast.Daily.Data[0].TemperatureHigh
+		low := forecast.Daily.Data[0].TemperatureLow
+		if units == "C" {
+			now = convert(now)
+			feels = convert(feels)
+			high = convert(high)
+			low = convert(low)
+		}
+		fmt.Printf("Weather in %s, %s, %s\n", geo.City, geo.Region, geo.Country)
+		fmt.Printf("%s\n", forecast.Currently.Summary)
+		fmt.Printf("Temperature now (°%s): %f\n", units, now)
+		fmt.Printf("Feels like (°%s): %f\n", units, feels)
+		fmt.Printf("High (°%s): %f\n", units, high)
+		fmt.Printf("Low (°%s): %f\n", units, low)
+		fmt.Printf("Wind speed (mph): %f\n", forecast.Currently.WindSpeed)
 	}
-	fmt.Printf("Weather in %s, %s, %s\n", geo.City, geo.Region, geo.Country)
-	fmt.Printf("%s\n", forecast.Currently.Summary)
-	fmt.Printf("Temperature now (°%s): %f\n", units, now)
-	fmt.Printf("Feels like (°%s): %f\n", units, feels)
-	fmt.Printf("High (°%s): %f\n", units, high)
-	fmt.Printf("Low (°%s): %f\n", units, low)
-	fmt.Printf("Wind speed (mph): %f\n", forecast.Currently.WindSpeed)
 }
 
 func convert(fahrenheit float64) float64 {
